@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HACKED</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background: #000;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .page.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.6s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        #page0 {
+            background: transparent;
+            flex-direction: column;
+            padding: 40px;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+        .tracking-container {
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .tracking-title {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            color: #00ff00;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8), 0 0 40px rgba(0, 255, 0, 0.4);
+            margin-bottom: 60px;
+            letter-spacing: 3px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            position: relative;
+            z-index: 10;
+        }
+        .tracking-subtitle {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #00ff00;
+            margin-bottom: 400px;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .bottom-corner-hint {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            color: #00ff00;
+            cursor: pointer;
+            border: 2px solid #00ff00;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            animation: pulse 2s ease-in-out infinite;
+            z-index: 10;
+            border-radius: 5px;
+        }
+        .bottom-corner-hint:hover {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+            transform: scale(1.05);
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 0, 0.8); }
+        }
+        
+        /* Touch Indicator */
+        .touch-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 5;
+            opacity: 0;
+            animation: fadeInIndicator 1s ease forwards;
+            animation-delay: 1s;
+            pointer-events: none;
+        }
+        .touch-text {
+            color: #00ff00;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .touch-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            border: 3px solid #00ff00;
+            border-radius: 50%;
+            position: relative;
+            animation: ripple 2s ease-in-out infinite;
+        }
+        .touch-icon::before {
+            content: '';
+            font-size: 24px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes fadeInIndicator {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes ripple {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+            100% { box-shadow: 0 0 0 30px rgba(0, 255, 0, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .tracking-subtitle {
+                margin-bottom: 250px;
+            }
+            .bottom-corner-hint {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    
+    <!-- Touch Indicator -->
+    <div class="touch-indicator" id="touchIndicator">
+        <div class="touch-text">Tap / Click / Scroll to Continue</div>
+        <div class="touch-icon"></div>
+    </div>
+    
+    <div class="page active" id="page0">
+        <div class="tracking-container">
+            <!-- Background Music -->
+            <audio id="bgMusic" loop preload="auto">
+                <source src="https://files.catbox.moe/zbp3ub.mp3" type="audio/mpeg">
+            </audio>
+            
+            <div class="tracking-title">Someone has been tracking you..</div>
+            <div class="tracking-subtitle">Look at the bottom corner →</div>
+            <div class="bottom-corner-hint" onclick="window.location.href='page1.html';">
+                Wanna know who tracked you?
+            </div>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Music control
+        let musicStarted = false;
+        const bgMusic = document.getElementById('bgMusic');
+        const touchIndicator = document.getElementById('touchIndicator');
+        
+        bgMusic.volume = 0.7;
+        
+        function startMusic() {
+            if (!musicStarted) {
+                bgMusic.play().then(() => {
+                    musicStarted = true;
+                    console.log('Music started');
+                    // Hide touch indicator
+                    if (touchIndicator) {
+                        touchIndicator.style.opacity = '0';
+                        setTimeout(() => {
+                            touchIndicator.style.display = 'none';
+                        }, 500);
+                    }
+                }).catch(err => {
+                    console.log('Music play failed:', err);
+                });
+            }
+        }
+        
+        // Add event listeners for all interactions
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
+        document.addEventListener('touchmove', startMusic);
+        document.addEventListener('scroll', startMusic);
+        document.addEventListener('keydown', startMusic);
+        document.addEventListener('mousemove', startMusic);
+
+        // Matrix rain effect
+        const fontSize = 14;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = [];
+        
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+        
+        const chars = '10アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        
+        // Binary code flowing
+        const binaryStreams = [];
+        const streamCount = 15;
+        
+        class BinaryStream {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.targetX = Math.random() * canvas.width;
+                this.targetY = Math.random() * canvas.height;
+                this.progress = 0;
+                this.speed = 0.005 + Math.random() * 0.01;
+                this.text = this.generateBinary();
+            }
+            
+            generateBinary() {
+                let result = '';
+                for (let i = 0; i < 8; i++) {
+                    result += Math.random() > 0.5 ? '1' : '0';
+                }
+                return result;
+            }
+            
+            update() {
+                this.progress += this.speed;
+                
+                if (this.progress >= 1) {
+                    this.reset();
+                }
+                
+                this.x = this.x + (this.targetX - this.x) * this.progress;
+                this.y = this.y + (this.targetY - this.y) * this.progress;
+            }
+            
+            draw() {
+                const alpha = Math.sin(this.progress * Math.PI) * 0.08;
+                ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`;
+                ctx.font = '10px Fira Code';
+                ctx.fillText(this.text, this.x, this.y);
+            }
+        }
+        
+        // Initialize binary streams
+        for (let i = 0; i < streamCount; i++) {
+            binaryStreams.push(new BinaryStream());
+        }
+        
+        // Tracking lines
+        const trackingLines = [];
+        const lineCount = 5;
+        
+        class TrackingLine {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                this.startX = Math.random() * canvas.width;
+                this.startY = Math.random() * canvas.height;
+                this.endX = Math.random() * canvas.width;
+                this.endY = Math.random() * canvas.height;
+                this.progress = 0;
+                this.speed = 0.01 + Math.random() * 0.02;
+            }
+            
+            update() {
+                this.progress += this.speed;
+                if (this.progress >= 1) {
+                    this.reset();
+                }
+            }
+            
+            draw() {
+                const currentX = this.startX + (this.endX - this.startX) * this.progress;
+                const currentY = this.startY + (this.endY - this.startY) * this.progress;
+                
+                const alpha = Math.sin(this.progress * Math.PI) * 0.05;
+                ctx.strokeStyle = `rgba(0, 255, 0, ${alpha})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(this.startX, this.startY);
+                ctx.lineTo(currentX, currentY);
+                ctx.stroke();
+                
+                // Draw dot at end
+                ctx.fillStyle = `rgba(0, 255, 0, ${alpha * 2})`;
+                ctx.beginPath();
+                ctx.arc(currentX, currentY, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Initialize tracking lines
+        for (let i = 0; i < lineCount; i++) {
+            trackingLines.push(new TrackingLine());
+        }
+        
+        function drawMatrixRain() {
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.03)';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                ctx.fillText(char, x, y);
+                
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                
+                drops[i]++;
+            }
+        }
+        
+        function animate() {
+            // Fade effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Matrix rain
+            drawMatrixRain();
+            
+            // Binary streams
+            binaryStreams.forEach(stream => {
+                stream.update();
+                stream.draw();
+            });
+            
+            // Tracking lines
+            trackingLines.forEach(line => {
+                line.update();
+                line.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    </script>
+</body>
+</html>

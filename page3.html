@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INITIALIZING...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background: #000;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .page.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.6s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Hacker Terminal Page */
+        #page3 {
+            background: transparent;
+            flex-direction: column;
+            padding: 40px;
+        }
+        .terminal {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            line-height: 2.2;
+            max-width: 900px;
+            color: #00ff00;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            font-family: 'Fira Code', monospace;
+        }
+        .terminal-line {
+            opacity: 0;
+            animation: typeIn 0.5s ease forwards;
+            margin: 8px 0;
+        }
+        @keyframes typeIn {
+            to { opacity: 1; }
+        }
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #00ff00;
+            animation: blink 1s step-end infinite;
+            margin-left: 5px;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .hacker-emoji {
+            font-size: 3rem;
+            margin: 30px 0;
+            animation: glitch 2s ease infinite;
+            color: #00ff00;
+            text-shadow: 0 0 20px #00ff00;
+            display: none;
+        }
+        @keyframes glitch {
+            0%, 90%, 100% { 
+                transform: translate(0);
+                text-shadow: 0 0 20px #00ff00;
+            }
+            92% { 
+                transform: translate(-2px, 2px);
+                text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+            }
+            94% { 
+                transform: translate(2px, -2px);
+                text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff;
+            }
+            96% { 
+                transform: translate(-2px, -2px);
+                text-shadow: 0 0 20px #00ff00;
+            }
+        }
+        .access-granted {
+            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+            color: #00ff00;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin: 20px 0;
+            opacity: 0;
+            animation: typeIn 0.5s ease forwards;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.9);
+        }
+        .next-btn {
+            margin-top: 40px;
+            padding: 18px 50px;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+            border-radius: 8px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        .next-btn:hover {
+            background: rgba(0, 255, 0, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.7);
+        }
+        .warning-text {
+            color: #ffff00;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            margin-top: 10px;
+            letter-spacing: 1px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @media (max-width: 768px) {
+            #page3 {
+                padding: 20px;
+            }
+            .terminal {
+                font-size: 1rem;
+                line-height: 2;
+            }
+            .hacker-emoji {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    <div class="page active" id="page3">
+        <div class="terminal">
+            <div class="terminal-line" style="animation-delay: 0s;">> accessing birthday protocols...</div>
+            <div class="terminal-line" style="animation-delay: 0.5s;">> bypassing security systems...</div>
+            <div class="terminal-line" style="animation-delay: 1s;">> decrypting special message...</div>
+            <div class="terminal-line" style="animation-delay: 1.5s;">> loading birthday.exe...</div>
+            <div class="terminal-line" style="animation-delay: 2s;">> today's your birthday</div>
+            <div class="terminal-line" style="animation-delay: 2.5s;">> initiating surprise protocol...</div>
+            <div class="terminal-line warning-text" style="animation-delay: 3s; opacity: 0;">> WARNING: Unauthorized access detected</div>
+            <div class="terminal-line" style="animation-delay: 3.5s;">> Tracing source...</div>
+            <div class="terminal-line" style="animation-delay: 4s;">> Identity verification in progress...</div>
+            <div class="access-granted" style="animation-delay: 4.5s;">>> ACCESS GRANTED <<</div>
+            <button class="next-btn" onclick="window.location.href='guess.html'" style="animation-delay: 5s;">
+                ▶ CONTINUE PROTOCOL
+            </button>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Matrix-style background effect
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 16;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = [];
+        
+        function initDrops() {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -canvas.height / fontSize;
+            }
+        }
+        
+        initDrops();
+        window.addEventListener('resize', initDrops);
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                ctx.fillText(text, x, y);
+                
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 20px 0;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .failure-container {
+            text-align: center;
+            padding: 60px 40px;
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+            animation: fadeIn 0.8s ease;
+            margin: 20px auto;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+        
+        .status-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            border: 4px solid #ff4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            animation: iconAppear 0.6s ease;
+            box-shadow: 0 0 40px rgba(255, 68, 68, 0.4);
+        }
+        
+        @keyframes iconAppear {
+            0% { 
+                transform: scale(0);
+                opacity: 0;
+            }
+            60% { 
+                transform: scale(1.1);
+            }
+            100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .failure-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 700;
+            color: #ff4444;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        }
+        
+        .failure-code {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: #888;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+        
+        .divider {
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff4444, transparent);
+            margin: 30px auto;
+        }
+        
+        .failure-message {
+            font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+            color: #e0e0e0;
+            line-height: 1.8;
+            margin: 30px 0;
+            letter-spacing: 0.5px;
+        }
+        
+        .failure-message .emphasis {
+            color: #00ff00;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .instruction-box {
+            background: rgba(255, 68, 68, 0.1);
+            border-left: 4px solid #ff4444;
+            padding: 20px 30px;
+            margin: 40px auto;
+            max-width: 600px;
+            text-align: left;
+            border-radius: 5px;
+        }
+        
+        .instruction-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: #ff4444;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .instruction-text {
+            font-size: clamp(0.95rem, 2.3vw, 1.1rem);
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+        
+        .retry-section {
+            margin-top: 50px;
+        }
+        
+        .retry-text {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: #00ff00;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+        
+        .retry-btn {
+            padding: 18px 50px;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.05);
+            color: #00ff00;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+        
+        .retry-btn:hover {
+            background: rgba(0, 255, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 30px rgba(0, 255, 0, 0.4);
+        }
+        
+        .retry-btn:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .failure-container {
+                padding: 40px 20px;
+            }
+            .instruction-box {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    
+    <div class="failure-container">
+        <div class="status-icon">✕</div>
+        
+        <div class="failure-title">Access Denied</div>
+        <div class="failure-code">ERROR CODE: 403 | UNAUTHORIZED</div>
+        
+        <div class="divider"></div>
+        
+        <div class="failure-message">
+            Unfortunately, you have not followed the instructions correctly.<br>
+            The prompt indicated to click <span class="emphasis">"NO"</span> if you were excited to proceed.
+        </div>
+        
+        <div class="instruction-box">
+            <div class="instruction-title">What Went Wrong?</div>
+            <div class="instruction-text">
+                The instructions explicitly stated: "If you are excited you should click NO"<br><br>
+                Please read all prompts carefully before making your selection to ensure proper navigation through the system.
+            </div>
+        </div>
+        
+        <div class="retry-section">
+            <div class="retry-text">You may restart the process to try again</div>
+            <button class="retry-btn" onclick="window.location.href='index.html'">
+                Restart Process
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Subtle Matrix effect
+        const chars = '01';
+        const fontSize = 14;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = [];
+        
+        function initDrops() {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -canvas.height / fontSize;
+            }
+        }
+        
+        initDrops();
+        window.addEventListener('resize', initDrops);
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(255, 68, 68, 0.1)';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                ctx.fillText(text, x, y);
+                
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 60);
+    </script>
+</body>
+</html>

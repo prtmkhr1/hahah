@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DECODE THE TARGET</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background: #000;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+            width: 90%;
+            padding: 50px 40px;
+            animation: fadeIn 0.8s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+        }
+        .title {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: #00ff00;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+        }
+        .subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: rgba(0, 255, 0, 0.8);
+            letter-spacing: 1px;
+            line-height: 1.6;
+        }
+        .challenge-box {
+            padding: 35px 25px;
+            margin: 30px 0;
+        }
+        .challenge-text {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: #00ff00;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            font-family: 'Fira Code', monospace;
+            line-height: 1.8;
+        }
+        .question {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: #ffff00;
+            margin: 25px 0;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        .input-container {
+            margin: 35px 0;
+        }
+        .input-field {
+            width: 100%;
+            max-width: 550px;
+            padding: 18px 25px;
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Fira Code', monospace;
+            letter-spacing: 1px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.1);
+            border-radius: 6px;
+        }
+        .input-field:focus {
+            outline: none;
+            background: rgba(0, 0, 0, 0.8);
+            border-color: #00ff00;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.4), inset 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+        .input-field::placeholder {
+            color: rgba(0, 255, 0, 0.4);
+            letter-spacing: 1px;
+        }
+        .submit-btn {
+            margin-top: 30px;
+            padding: 16px 55px;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            background: transparent;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            border-radius: 6px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 255, 0, 0.2);
+            transition: left 0.4s ease;
+        }
+        .submit-btn:hover::before {
+            left: 0;
+        }
+        .submit-btn:hover {
+            border-color: #00ff00;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            transform: translateY(-2px);
+        }
+        .submit-btn span {
+            position: relative;
+            z-index: 1;
+        }
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        .status-container {
+            min-height: 50px;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .processing {
+            display: none;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            color: #00ff00;
+            letter-spacing: 2px;
+            font-family: 'Fira Code', monospace;
+        }
+        .processing.show {
+            display: block;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .error-message {
+            display: none;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            color: #ff3333;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.6);
+            font-family: 'Fira Code', monospace;
+            padding: 15px;
+        }
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-8px); }
+        }
+        .attempts-counter {
+            margin-top: 20px;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            color: rgba(0, 255, 0, 0.6);
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            .challenge-box {
+                padding: 25px 15px;
+            }
+            .input-field {
+                padding: 15px 20px;
+            }
+            .submit-btn {
+                padding: 14px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    
+    <div class="container">
+        <div class="header">
+            <div class="title">DECODE THE TARGET</div>
+            <div class="subtitle">Unauthorized access detected to birthday system</div>
+        </div>
+        
+        <div class="challenge-box">
+            <div class="challenge-text">
+                >> Mission briefing: Someone's birthday has been compromised<br>
+                >> Your task: Identify the target individual
+            </div>
+            
+            <div class="question">WHO IS THE BIRTHDAY PERSON?</div>
+            
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    class="input-field" 
+                    id="nameInput" 
+                    placeholder="Enter name"
+                    autocomplete="off"
+                >
+            </div>
+            
+            <button class="submit-btn" onclick="checkGuess()">
+                <span>► SUBMIT ANSWER</span>
+            </button>
+            
+            <div class="status-container">
+                <div class="processing" id="processing">> Analyzing response...</div>
+                <div class="error-message" id="errorMessage">> INCORRECT: Access denied. Try again.</div>
+            </div>
+            
+            <div class="attempts-counter" id="attemptsCounter"></div>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Matrix background
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 16;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = [];
+        
+        function initDrops() {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -canvas.height / fontSize;
+            }
+        }
+        
+        initDrops();
+        window.addEventListener('resize', initDrops);
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                ctx.fillText(text, x, y);
+                
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+        
+        let attempts = 0;
+        
+        // Allow Enter key to submit
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkGuess();
+            }
+        });
+        
+        function checkGuess() {
+            const input = document.getElementById('nameInput').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const processing = document.getElementById('processing');
+            const attemptsCounter = document.getElementById('attemptsCounter');
+            
+            if (input === '') return;
+            
+            // Hide error message first
+            errorMessage.classList.remove('show');
+            
+            // Show processing
+            processing.classList.add('show');
+            
+            setTimeout(() => {
+                processing.classList.remove('show');
+                attempts++;
+                
+                // Normalize input for comparison
+                const normalizedInput = input.toLowerCase().replace(/\s+/g, ' ');
+                
+                // Accepted answers
+                const correctAnswers = [
+                    'subhekshya bhattarai',
+                    'subekshya bhattarai',
+                    'subhekshya',
+                    'subekshya'
+                ];
+                
+                // Check if correct
+                if (correctAnswers.includes(normalizedInput)) {
+                    // Success animation
+                    document.querySelector('.container').style.animation = 'fadeOut 0.6s ease forwards';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'page4.html'; // Change to your next page
+                    }, 600);
+                } else {
+                    // Show error
+                    errorMessage.classList.add('show');
+                    attemptsCounter.textContent = `Failed attempts: ${attempts}`;
+                    
+                    // Shake input field
+                    const inputField = document.getElementById('nameInput');
+                    inputField.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        inputField.style.animation = '';
+                    }, 500);
+                }
+            }, 1200);
+        }
+        
+        // Add fadeOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0) scale(1); }
+                to { opacity: 0; transform: translateY(-30px) scale(0.95); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

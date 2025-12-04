@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celebration Complete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 40px 20px;
+            position: relative;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            margin-bottom: 50px;
+        }
+        
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 900;
+            color: #00ff00;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 25px rgba(0, 255, 0, 0.8); }
+            50% { text-shadow: 0 0 40px rgba(0, 255, 0, 1); }
+        }
+        
+        .subtitle {
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+            color: #888;
+            letter-spacing: 2px;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .status-box {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(0, 20, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            text-align: left;
+        }
+        
+        .status-line {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: #888;
+            margin: 10px 0;
+            opacity: 0;
+            animation: typeLine 0.5s ease forwards;
+        }
+        
+        .status-line:nth-child(1) { animation-delay: 0.2s; }
+        .status-line:nth-child(2) { animation-delay: 0.5s; }
+        .status-line:nth-child(3) { animation-delay: 0.8s; }
+        .status-line:nth-child(4) { animation-delay: 1.1s; }
+        .status-line:nth-child(5) { animation-delay: 1.4s; }
+        
+        @keyframes typeLine {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .status-success {
+            color: #00ff00;
+        }
+        
+        .final-message {
+            margin: 50px 0;
+            padding: 40px 30px;
+            background: rgba(0, 20, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 1.8s forwards;
+        }
+        
+        .message-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            color: #00ff00;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .message-content {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.95rem, 2.3vw, 1.1rem);
+            color: #e0e0e0;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+            text-align: left;
+            margin: 20px 0;
+        }
+        
+        .highlight {
+            color: #00ff00;
+            font-weight: 600;
+        }
+        
+        .message-signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 255, 0, 0.2);
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+            color: #00ff00;
+            text-align: right;
+        }
+        
+        .communication-section {
+            margin: 50px 0;
+            padding: 40px 30px;
+            background: rgba(0, 20, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 2.5s forwards;
+        }
+        
+        .comm-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            color: #00ff00;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .comm-subtitle {
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: #888;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+        
+        .form-group {
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .form-label {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            color: #00ff00;
+            margin-bottom: 10px;
+            display: block;
+            letter-spacing: 1px;
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            background: rgba(0, 20, 0, 0.3);
+        }
+        
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .char-counter {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .send-btn {
+            padding: 15px 45px;
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            background: transparent;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 255, 0, 0.8);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .status-message.show {
+            opacity: 1;
+        }
+        
+        .status-message.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00ff00;
+        }
+        
+        .status-message.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6666;
+        }
+        
+        .farewell-section {
+            margin: 50px 0;
+            padding: 30px;
+            background: rgba(0, 20, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 3s forwards;
+        }
+        
+        .farewell-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: #00ff00;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        @media (max-width: 768px) {
+            .status-box, .final-message, .communication-section, .farewell-section {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    
+    <div class="container">
+        <div class="header">
+            <div class="main-title">CELEBRATION PROTOCOL COMPLETE</div>
+            <div class="subtitle">System Status: All objectives achieved</div>
+        </div>
+        
+        <div class="status-box">
+            <div class="status-line">► Executing shutdown sequence...</div>
+            <div class="status-line">► Birthday celebration: <span class="status-success">SUCCESS</span></div>
+            <div class="status-line">► Messages delivered: <span class="status-success">CONFIRMED</span></div>
+            <div class="status-line">► Memory creation: <span class="status-success">COMPLETE</span></div>
+            <div class="status-line">► System status: <span class="status-success">ALL GREEN</span></div>
+        </div>
+        
+        <div class="final-message">
+            <div class="message-title">► FINAL TRANSMISSION</div>
+            <div class="message-content">
+                Subhekshya,<br><br>
+                
+                This entire experience was created just for you. Every line of code, every animation, every word was crafted to celebrate <span class="highlight">your special day</span>.<br><br>
+                
+                You're an incredible person who brings light to those around you. May this year bring you closer to all your dreams, fill your days with joy, and surround you with people who appreciate how amazing you are.<br><br>
+                
+                Keep being <span class="highlight">brilliant</span>, keep being <span class="highlight">curious</span>, and never stop <span class="highlight">reaching for the stars</span>.<br><br>
+                
+                Thank you for being such an awesome friend. Here's to many more years of friendship, laughter, and shared memories!
+            </div>
+            <div class="message-signature">
+                — Prabesh Kharel
+            </div>
+        </div>
+        
+        <div class="communication-section">
+            <div class="comm-title">► OPEN COMMUNICATION CHANNEL</div>
+            <div class="comm-subtitle">Send a message back • Direct transmission enabled</div>
+            
+            <form id="messageForm">
+                <div class="form-group">
+                    <label class="form-label">YOUR NAME:</label>
+                    <input type="text" class="form-input" id="senderName" placeholder="Enter your name..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">MESSAGE CONTENT:</label>
+                    <textarea class="form-textarea" id="messageContent" placeholder="Type your message here..." maxlength="1000" required></textarea>
+                    <div class="char-counter"><span id="charCount">0</span>/1000 characters</div>
+                </div>
+                
+                <button type="submit" class="send-btn" id="sendBtn">
+                    ► TRANSMIT MESSAGE
+                </button>
+                
+                <div class="status-message" id="statusMessage"></div>
+            </form>
+        </div>
+        
+        <div class="farewell-section">
+            <div class="farewell-text">
+                ✨ UNTIL NEXT TIME ✨<br>
+                <small style="font-size: 0.7em; color: #666;">Session will remain active</small>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Matrix background
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 16;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = [];
+        
+        function initDrops() {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -canvas.height / fontSize;
+            }
+        }
+        
+        initDrops();
+        window.addEventListener('resize', initDrops);
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                ctx.fillText(text, x, y);
+                
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+        
+        // Character counter
+        const messageContent = document.getElementById('messageContent');
+        const charCount = document.getElementById('charCount');
+        
+        messageContent.addEventListener('input', () => {
+            charCount.textContent = messageContent.value.length;
+        });
+        
+        // Form submission
+        const messageForm = document.getElementById('messageForm');
+        const statusMessage = document.getElementById('statusMessage');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const senderName = document.getElementById('senderName').value.trim();
+            const message = messageContent.value.trim();
+            
+            if (!senderName || !message) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+            
+            sendBtn.disabled = true;
+            sendBtn.textContent = '► TRANSMITTING...';
+            
+            // Simulate sending (you'll need to implement actual backend)
+            // Here are options for implementation:
+            
+            // OPTION 1: Using FormSubmit (easiest, no backend needed)
+            const formData = new FormData();
+            formData.append('name', senderName);
+            formData.append('message', message);
+            formData.append('timestamp', new Date().toISOString());
+            
+            try {
+                // Replace 'YOUR_EMAIL' with your actual email
+                const response = await fetch('https://formsubmit.co/xabiandres1@gmail.com', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    showStatus('✓ Message transmitted successfully!', 'success');
+                    messageForm.reset();
+                    charCount.textContent = '0';
+                } else {
+                    throw new Error('Transmission failed');
+                }
+            } catch (error) {
+                showStatus('✗ Transmission failed. Please try again.', 'error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = '► TRANSMIT MESSAGE';
+            }
+        });
+        
+        function showStatus(text, type) {
+            statusMessage.textContent = text;
+            statusMessage.className = `status-message ${type} show`;
+            
+            setTimeout(() => {
+                statusMessage.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

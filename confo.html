@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 20px 0;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .security-container {
+            text-align: center;
+            padding: clamp(40px, 8vw, 70px) clamp(30px, 6vw, 60px);
+            max-width: 850px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+            animation: fadeIn 0.8s ease;
+            margin: 20px auto;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .security-badge {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            border: 3px solid #00ff00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            animation: rotateBadge 3s linear infinite;
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.4);
+        }
+        
+        @keyframes rotateBadge {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .security-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            color: #00ff00;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+        }
+        
+        .security-subtitle {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.9rem, 2.3vw, 1.1rem);
+            color: #888;
+            margin-bottom: 60px;
+            letter-spacing: 2px;
+        }
+        
+        .alert-section {
+            margin: 40px 0;
+        }
+        
+        .alert-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .alert-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            color: #ffff00;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+        }
+        
+        .alert-text {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: #b0b0b0;
+            line-height: 1.8;
+            margin: 15px 0 50px 0;
+        }
+        
+        .verification-section {
+            margin: 50px 0;
+        }
+        
+        .verification-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.1rem, 2.8vw, 1.4rem);
+            color: #00ff00;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .verification-question {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: #888;
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+        
+        .name-input-container {
+            margin: 30px 0;
+        }
+        
+        .name-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-family: 'Fira Code', monospace;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            color: #00ff00;
+            text-align: center;
+            letter-spacing: 2px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+        
+        .name-input:focus {
+            border-color: #00ff00;
+            box-shadow: 0 0 35px rgba(0, 255, 0, 0.5);
+            background: rgba(0, 255, 0, 0.05);
+        }
+        
+        .name-input::placeholder {
+            color: rgba(0, 255, 0, 0.4);
+            letter-spacing: 1px;
+        }
+        
+        .hint-text {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.85rem, 2.2vw, 1rem);
+            color: #666;
+            margin-top: 15px;
+        }
+        
+        .error-message {
+            padding: 15px 20px;
+            margin: 25px auto;
+            max-width: 500px;
+            color: #ff4444;
+            font-size: clamp(0.95rem, 2.3vw, 1.1rem);
+            display: none;
+            animation: shake 0.5s ease;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+            font-family: 'Fira Code', monospace;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .verify-btn, .cancel-btn {
+            padding: 16px 45px;
+            font-size: clamp(0.95rem, 2.3vw, 1.1rem);
+            border: 2px solid;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            text-transform: uppercase;
+            background: transparent;
+        }
+        
+        .verify-btn {
+            border-color: #00ff00;
+            color: #00ff00;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
+        }
+        
+        .verify-btn:hover {
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 255, 0, 0.6);
+        }
+        
+        .verify-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .cancel-btn {
+            border-color: #666;
+            color: #666;
+        }
+        
+        .cancel-btn:hover {
+            border-color: #888;
+            color: #888;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .security-container {
+                padding: 40px 25px;
+            }
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .verify-btn, .cancel-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            .name-input {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    
+    <div class="security-container">
+        <div class="security-badge">🔒</div>
+        <div class="security-title">Identity Verification</div>
+        <div class="security-subtitle">Level 2 Authentication Protocol</div>
+        
+        <div class="alert-section">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-title">AUTHENTICATION REQUIRED</div>
+            <div class="alert-text">
+                Access to this system requires identity confirmation.<br>
+                Provide the designated identification name to proceed.
+            </div>
+        </div>
+        
+        <div class="verification-section">
+            <div class="verification-label">IDENTITY VERIFICATION</div>
+            <div class="verification-question">
+                Enter the name by which the Prabesh calls you often
+            </div>
+            
+            <div class="name-input-container">
+                <input 
+                    type="text" 
+                    id="nameInput" 
+                    class="name-input" 
+                    placeholder="Enter identification..."
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <div class="hint-text">Case insensitive</div>
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                ACCESS DENIED: Invalid credentials
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="verify-btn" id="verifyBtn" onclick="verifyIdentity()">
+                AUTHENTICATE
+            </button>
+            <button class="cancel-btn" onclick="window.location.href='index.html'">
+                CANCEL
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Matrix effect
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 16;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = [];
+        
+        function initDrops() {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -canvas.height / fontSize;
+            }
+        }
+        
+        initDrops();
+        window.addEventListener('resize', initDrops);
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                ctx.fillText(text, x, y);
+                
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+        
+        // Name verification logic
+        const nameInput = document.getElementById('nameInput');
+        const errorMessage = document.getElementById('errorMessage');
+        const verifyBtn = document.getElementById('verifyBtn');
+        
+        // Allow Enter key to submit
+        nameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyIdentity();
+            }
+        });
+        
+        function verifyIdentity() {
+            const inputName = nameInput.value.trim();
+            
+            // Check if input is empty
+            if (inputName === '') {
+                showError();
+                return;
+            }
+            
+            // Check if name matches (case insensitive)
+            if (inputName.toLowerCase() === 'subi') {
+                // Correct name - proceed to next page
+                successAnimation();
+                setTimeout(() => {
+                    window.location.href = 'page3.html';
+                }, 1000);
+            } else {
+                // Incorrect name - show error
+                showError();
+            }
+        }
+        
+        function showError() {
+            errorMessage.classList.add('show');
+            nameInput.style.borderColor = '#ff4444';
+            nameInput.style.boxShadow = '0 0 30px rgba(255, 68, 68, 0.6)';
+            
+            // Shake the input
+            nameInput.style.animation = 'shake 0.5s ease';
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+                nameInput.style.borderColor = '#00ff00';
+                nameInput.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.2)';
+                nameInput.style.animation = '';
+                nameInput.value = '';
+                nameInput.focus();
+            }, 2000);
+        }
+        
+        function successAnimation() {
+            nameInput.style.borderColor = '#00ff00';
+            nameInput.style.boxShadow = '0 0 50px rgba(0, 255, 0, 0.9)';
+            nameInput.style.background = 'rgba(0, 255, 0, 0.2)';
+            verifyBtn.textContent = 'ACCESS GRANTED';
+            verifyBtn.style.background = '#00ff00';
+            verifyBtn.style.color = '#000';
+        }
+    </script>
+</body>
+</html>
