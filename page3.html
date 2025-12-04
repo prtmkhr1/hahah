@@ -12,17 +12,19 @@
             box-sizing: border-box;
         }
         body {
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             background: #000;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             font-family: 'Share Tech Mono', monospace;
+            padding: 20px;
         }
         canvas {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             z-index: 0;
@@ -31,10 +33,7 @@
         .page {
             display: none;
             width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             z-index: 1;
         }
         .page.active {
@@ -52,12 +51,14 @@
         #page3 {
             background: transparent;
             flex-direction: column;
-            padding: 40px;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
         }
         .terminal {
-            font-size: clamp(1.1rem, 3vw, 1.4rem);
-            line-height: 2.2;
-            max-width: 900px;
+            font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+            line-height: 2;
+            width: 100%;
             color: #00ff00;
             letter-spacing: 0.5px;
             text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
@@ -66,15 +67,16 @@
         .terminal-line {
             opacity: 0;
             animation: typeIn 0.5s ease forwards;
-            margin: 8px 0;
+            margin: 6px 0;
+            word-wrap: break-word;
         }
         @keyframes typeIn {
             to { opacity: 1; }
         }
         .cursor {
             display: inline-block;
-            width: 10px;
-            height: 20px;
+            width: 8px;
+            height: 16px;
             background: #00ff00;
             animation: blink 1s step-end infinite;
             margin-left: 5px;
@@ -84,37 +86,11 @@
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
-        .hacker-emoji {
-            font-size: 3rem;
-            margin: 30px 0;
-            animation: glitch 2s ease infinite;
-            color: #00ff00;
-            text-shadow: 0 0 20px #00ff00;
-            display: none;
-        }
-        @keyframes glitch {
-            0%, 90%, 100% { 
-                transform: translate(0);
-                text-shadow: 0 0 20px #00ff00;
-            }
-            92% { 
-                transform: translate(-2px, 2px);
-                text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
-            }
-            94% { 
-                transform: translate(2px, -2px);
-                text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff;
-            }
-            96% { 
-                transform: translate(-2px, -2px);
-                text-shadow: 0 0 20px #00ff00;
-            }
-        }
         .access-granted {
-            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+            font-size: clamp(1.1rem, 3vw, 1.8rem);
             color: #00ff00;
             font-weight: bold;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             margin: 20px 0;
             opacity: 0;
             animation: typeIn 0.5s ease forwards;
@@ -122,9 +98,9 @@
             text-shadow: 0 0 15px rgba(0, 255, 0, 0.9);
         }
         .next-btn {
-            margin-top: 40px;
-            padding: 18px 50px;
-            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
             background: rgba(0, 255, 0, 0.1);
             color: #00ff00;
             border: 2px solid #00ff00;
@@ -138,6 +114,8 @@
             text-transform: uppercase;
             opacity: 0;
             animation: fadeIn 0.5s ease forwards;
+            width: 100%;
+            max-width: 400px;
         }
         .next-btn:hover {
             background: rgba(0, 255, 0, 0.3);
@@ -146,7 +124,7 @@
         }
         .warning-text {
             color: #ffff00;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            font-size: clamp(0.85rem, 2.2vw, 1.1rem);
             margin-top: 10px;
             letter-spacing: 1px;
             animation: pulse 2s ease-in-out infinite;
@@ -156,22 +134,127 @@
             50% { opacity: 0.6; }
         }
 
+        /* Touch Prompt */
+        .touch-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            text-align: center;
+            animation: fadeInPrompt 1s ease forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes fadeInPrompt {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .touch-prompt.hidden {
+            animation: fadeOutPrompt 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOutPrompt {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+        }
+        
+        .touch-icon {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 5px;
+            animation: tapAnimation 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes tapAnimation {
+            0%, 100% { 
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6));
+            }
+            50% { 
+                transform: scale(1.15);
+                filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.9));
+            }
+        }
+        
+        .touch-text {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            color: #00ff00;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { 
+                opacity: 0.7;
+            }
+            50% { 
+                opacity: 1;
+            }
+        }
+
+        /* Music Control - Hidden */
+        .music-control {
+            display: none;
+        }
+
         @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
             #page3 {
-                padding: 20px;
+                padding: 15px;
             }
             .terminal {
-                font-size: 1rem;
-                line-height: 2;
+                font-size: 0.85rem;
+                line-height: 1.8;
             }
-            .hacker-emoji {
-                font-size: 2.5rem;
+            .terminal-line {
+                margin: 5px 0;
+            }
+            .next-btn {
+                padding: 12px 30px;
+                margin-top: 25px;
+            }
+            .music-control {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+            .music-icon {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            #page3 {
+                padding: 10px;
+            }
+            .terminal {
+                font-size: 0.75rem;
+                line-height: 1.6;
+            }
+            .access-granted {
+                letter-spacing: 1px;
             }
         }
     </style>
 </head>
 <body>
     <canvas id="backgroundCanvas"></canvas>
+    
+    <!-- Touch Prompt -->
+    <div class="touch-prompt" id="touchPrompt">
+        <div class="touch-icon">👆</div>
+        <div class="touch-text">tap screen</div>
+    </div>
+    
     <div class="page active" id="page3">
         <div class="terminal">
             <div class="terminal-line" style="animation-delay: 0s;">> accessing birthday protocols...</div>
@@ -189,6 +272,13 @@
             </button>
         </div>
     </div>
+    
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="birthday-music.mp3" type="audio/mpeg">
+        <!-- Replace "birthday-music.mp3" with your music file -->
+    </audio>
+    
     <script>
         const canvas = document.getElementById('backgroundCanvas');
         const ctx = canvas.getContext('2d');
@@ -239,6 +329,35 @@
         }
         
         setInterval(drawMatrix, 50);
+        
+        // Music control
+        const bgMusic = document.getElementById('bgMusic');
+        const touchPrompt = document.getElementById('touchPrompt');
+        let hasInteracted = false;
+        
+        // Function to start music and hide prompt
+        function startMusic() {
+            if (!hasInteracted) {
+                bgMusic.play().then(() => {
+                    hasInteracted = true;
+                    
+                    // Hide touch prompt
+                    touchPrompt.classList.add('hidden');
+                    setTimeout(() => {
+                        touchPrompt.style.display = 'none';
+                    }, 500);
+                }).catch(err => {
+                    console.log('Music play failed:', err);
+                });
+            }
+        }
+        
+        // Play music on any user interaction
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
+        document.addEventListener('touchmove', startMusic);
+        document.addEventListener('scroll', startMusic);
+        document.addEventListener('keydown', startMusic);
     </script>
 </body>
 </html>
