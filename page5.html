@@ -347,8 +347,68 @@
             transform: translateY(-3px);
             box-shadow: 0 12px 40px rgba(0, 255, 0, 0.8);
         }
+
+        /* Touch Prompt */
+        .touch-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            text-align: center;
+            animation: fadeInPrompt 1s ease forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes fadeInPrompt {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .touch-prompt.hidden {
+            animation: fadeOutPrompt 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOutPrompt {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+        }
+        
+        .touch-icon {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 5px;
+            animation: tapAnimation 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes tapAnimation {
+            0%, 100% { 
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6));
+            }
+            50% { 
+                transform: scale(1.15);
+                filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.9));
+            }
+        }
+        
+        .touch-text {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            color: #00ff00;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
         
         @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
             .interactive-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
@@ -361,6 +421,12 @@
 </head>
 <body>
     <canvas id="backgroundCanvas"></canvas>
+    
+    <!-- Touch Prompt -->
+    <div class="touch-prompt" id="touchPrompt">
+        <div class="touch-icon">▼</div>
+        <div class="touch-text">tap anywhere to begin</div>
+    </div>
     
     <div class="container">
         <div class="header">
@@ -423,10 +489,10 @@ May this year unfold gently around you—<br>
 like morning light slowly opening across a calm sky,<br>
 revealing new hopes, new paths, and quiet moments of joy.<br>
 You have a presence that is soft yet steady,<br>
-the kind that doesn’t demand attention<br>
+the kind that doesn't demand attention<br>
 but still changes the atmosphere in ways that linger.<br><br>
 
-There’s a certain grace in the way you move through the world—<br>
+There's a certain grace in the way you move through the world—<br>
 not loud, not hurried,<br>
 but thoughtful, warm, and quietly inspiring.<br>
 Some people bring noise wherever they go,<br>
@@ -446,7 +512,7 @@ May you walk into days that feel like they were meant for you—<br>
 days where everything quietly falls into place.<br><br>
 
 And whatever dreams you hold close,<br>
-whatever hopes you’re too shy to say aloud,<br>
+whatever hopes you're too shy to say aloud,<br>
 I hope they find their way to you with surprising ease.<br><br>
 
 Subhekshya, your kindness, your simplicity,<br>
@@ -454,7 +520,7 @@ and the silent strength you carry<br>
 are more remarkable than you know.<br>
 I hope today reminds you of that.<br><br>
 
-So here’s to your journey—<br>
+So here's to your journey—<br>
 to new beginnings, soft chapters, and brighter horizons.<br>
 Once again, Happy Birthday.<br>
 May your days ahead be gentle, honest, and beautifully your own. ✨<br><br>
@@ -466,11 +532,16 @@ May your days ahead be gentle, honest, and beautifully your own. ✨<br><br>
             </div>
         </div>
         
-
         <button class="next-btn" id="nextBtn">
             ► PROCEED TO NEXT SECTOR
         </button>
     </div>
+    
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="birthday-music.mp3" type="audio/mpeg">
+        <!-- Replace "birthday-music.mp3" with your music file -->
+    </audio>
     
     <script>
         const canvas = document.getElementById('backgroundCanvas');
@@ -522,6 +593,35 @@ May your days ahead be gentle, honest, and beautifully your own. ✨<br><br>
         }
         
         setInterval(drawMatrix, 50);
+        
+        // Music control
+        const bgMusic = document.getElementById('bgMusic');
+        const touchPrompt = document.getElementById('touchPrompt');
+        let hasInteracted = false;
+        
+        // Function to start music and hide prompt
+        function startMusic() {
+            if (!hasInteracted) {
+                bgMusic.play().then(() => {
+                    hasInteracted = true;
+                    
+                    // Hide touch prompt
+                    touchPrompt.classList.add('hidden');
+                    setTimeout(() => {
+                        touchPrompt.style.display = 'none';
+                    }, 500);
+                }).catch(err => {
+                    console.log('Music play failed:', err);
+                });
+            }
+        }
+        
+        // Play music on any user interaction
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
+        document.addEventListener('touchmove', startMusic);
+        document.addEventListener('scroll', startMusic);
+        document.addEventListener('keydown', startMusic);
         
         // Interactive data blocks
         const dataBlocks = document.querySelectorAll('.data-block');
