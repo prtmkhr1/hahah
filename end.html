@@ -295,6 +295,7 @@
             letter-spacing: 2px;
             text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
             animation: pulse 2s ease-in-out infinite;
+            margin-bottom: 30px;
         }
         
         @keyframes pulse {
@@ -302,7 +303,89 @@
             50% { opacity: 0.6; }
         }
         
+        .restart-btn {
+            padding: 15px 45px;
+            font-size: clamp(0.95rem, 2.3vw, 1.1rem);
+            background: transparent;
+            color: #ffff00;
+            border: 2px solid #ffff00;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 30px rgba(255, 255, 0, 0.4);
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .restart-btn:hover {
+            background: rgba(255, 255, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 255, 0, 0.8);
+        }
+
+        /* Touch Prompt */
+        .touch-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            text-align: center;
+            animation: fadeInPrompt 1s ease forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes fadeInPrompt {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .touch-prompt.hidden {
+            animation: fadeOutPrompt 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOutPrompt {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+        }
+        
+        .touch-icon {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 5px;
+            animation: tapAnimation 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes tapAnimation {
+            0%, 100% { 
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6));
+            }
+            50% { 
+                transform: scale(1.15);
+                filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.9));
+            }
+        }
+        
+        .touch-text {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            color: #00ff00;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
         @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
             .status-box, .final-message, .communication-section, .farewell-section {
                 padding: 25px 20px;
             }
@@ -311,6 +394,12 @@
 </head>
 <body>
     <canvas id="backgroundCanvas"></canvas>
+    
+    <!-- Touch Prompt -->
+    <div class="touch-prompt" id="touchPrompt">
+        <div class="touch-icon">▼</div>
+        <div class="touch-text">tap anywhere to begin</div>
+    </div>
     
     <div class="container">
         <div class="header">
@@ -346,17 +435,17 @@
         
         <div class="communication-section">
             <div class="comm-title">► OPEN COMMUNICATION CHANNEL</div>
-            <div class="comm-subtitle">Send a message back • Direct transmission enabled</div>
+            <div class="comm-subtitle">Send a message back : If you have something to say • Direct transmission enabled</div>
             
             <form id="messageForm" action="https://getform.io/f/bxovovva" method="POST">
                 <div class="form-group">
                     <label class="form-label">YOUR NAME:</label>
-                    <input type="text" class="form-input" id="senderName" placeholder="Enter your name..." required>
+                    <input type="text" class="form-input" name="name" id="senderName" placeholder="Enter your name..." required>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">MESSAGE CONTENT:</label>
-                    <textarea class="form-textarea" id="messageContent" placeholder="Type your message here..." maxlength="1000" required></textarea>
+                    <textarea class="form-textarea" name="message" id="messageContent" placeholder="Type your message here..." maxlength="1000" required></textarea>
                     <div class="char-counter"><span id="charCount">0</span>/1000 characters</div>
                 </div>
                 
@@ -373,8 +462,17 @@
                 ✨ UNTIL NEXT TIME ✨<br>
                 <small style="font-size: 0.7em; color: #666;">Session will remain active</small>
             </div>
+            <button class="restart-btn" onclick="window.location.href='index.html'">
+                ◄ RESTART EXPERIENCE
+            </button>
         </div>
     </div>
+    
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="birthday-music.mp3" type="audio/mpeg">
+        <!-- Replace "birthday-music.mp3" with your music file -->
+    </audio>
     
     <script>
         const canvas = document.getElementById('backgroundCanvas');
@@ -427,6 +525,35 @@
         
         setInterval(drawMatrix, 50);
         
+        // Music control
+        const bgMusic = document.getElementById('bgMusic');
+        const touchPrompt = document.getElementById('touchPrompt');
+        let hasInteracted = false;
+        
+        // Function to start music and hide prompt
+        function startMusic() {
+            if (!hasInteracted) {
+                bgMusic.play().then(() => {
+                    hasInteracted = true;
+                    
+                    // Hide touch prompt
+                    touchPrompt.classList.add('hidden');
+                    setTimeout(() => {
+                        touchPrompt.style.display = 'none';
+                    }, 500);
+                }).catch(err => {
+                    console.log('Music play failed:', err);
+                });
+            }
+        }
+        
+        // Play music on any user interaction
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
+        document.addEventListener('touchmove', startMusic);
+        document.addEventListener('scroll', startMusic);
+        document.addEventListener('keydown', startMusic);
+        
         // Character counter
         const messageContent = document.getElementById('messageContent');
         const charCount = document.getElementById('charCount');
@@ -454,17 +581,10 @@
             sendBtn.disabled = true;
             sendBtn.textContent = '► TRANSMITTING...';
             
-            // Simulate sending (you'll need to implement actual backend)
-            // Here are options for implementation:
-            
-            // OPTION 1: Using FormSubmit (easiest, no backend needed)
-            const formData = new FormData();
-            formData.append('name', senderName);
-            formData.append('message', message);
+            const formData = new FormData(messageForm);
             formData.append('timestamp', new Date().toISOString());
             
             try {
-                // Replace 'YOUR_EMAIL' with your actual email
                 const response = await fetch('https://getform.io/f/bxovovva', {
                     method: 'POST',
                     body: formData
