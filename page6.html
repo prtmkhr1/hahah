@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Transmission</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            margin-bottom: 50px;
+        }
+
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 900;
+            color: #00ff00;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                text-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+            }
+
+            50% {
+                text-shadow: 0 0 40px rgba(0, 255, 0, 1);
+            }
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+            color: #888;
+            letter-spacing: 2px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .profile-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            color: #00ff00;
+            letter-spacing: 3px;
+            margin: 30px 0;
+            text-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+        }
+
+        .terminal-section {
+            margin: 40px 0;
+            padding: 20px 30px;
+            background: rgba(0, 20, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .terminal-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: #00ff00;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .terminal-line {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+            color: #888;
+            margin: 8px 0;
+            opacity: 0;
+            animation: typeLine 0.5s ease forwards;
+        }
+
+        .terminal-line:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .terminal-line:nth-child(3) {
+            animation-delay: 0.8s;
+        }
+
+        .terminal-line:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        @keyframes typeLine {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .terminal-prompt {
+            color: #00ff00;
+        }
+
+        .terminal-output {
+            color: #0f0;
+        }
+
+        .video-container {
+            margin: 50px auto;
+            max-width: 800px;
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 20, 0, 0.4);
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+            border-radius: 15px;
+            position: relative;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #005500;
+            font-family: 'Orbitron', sans-serif;
+            background: repeating-linear-gradient(45deg,
+                    #000,
+                    #000 10px,
+                    #001100 10px,
+                    #001100 20px);
+        }
+
+        .next-btn {
+            padding: 18px 55px;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            background: transparent;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 40px;
+            opacity: 0;
+            animation: fadeIn 1s ease 3s forwards;
+        }
+
+        .next-btn:hover {
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 255, 0, 0.8);
+        }
+
+        /* Scanline effect over video */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0),
+                    rgba(255, 255, 255, 0) 50%,
+                    rgba(0, 0, 0, 0.2) 50%,
+                    rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            .terminal-section {
+                padding: 15px;
+            }
+
+            .video-container {
+                margin: 30px auto;
+            }
+
+            .main-title {
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+
+    <div class="container">
+        <div class="header">
+            <div class="main-title">INCOMING TRANSMISSION</div>
+            <div class="subtitle">Secure Video Link Established</div>
+        </div>
+
+        <div class="profile-name">SUBHEKSHYA BHATTARAI</div>
+
+        <div class="terminal-section">
+            <div class="terminal-header">► CONNECTION LOG</div>
+            <div class="terminal-line"><span class="terminal-prompt">$</span> decrypt_stream --source=secure_server
+            </div>
+            <div class="terminal-line"><span class="terminal-output">Buffering video data... [||||||||||] 100%</span>
+            </div>
+            <div class="terminal-line"><span class="terminal-output">Decrypting audio stream... COMPLETE</span></div>
+            <div class="terminal-line"><span class="terminal-output">Rendering visual interface... READY</span></div>
+        </div>
+
+        <div class="video-container">
+            <div class="video-wrapper">
+                <!-- Replace 'your-video.mp4' with the actual video file -->
+                <!-- If no video is available, the controls will just show empty or poster -->
+                <video id="birthdayVideo" controls controlsList="nodownload">
+                    <source src="mess.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="scanlines"></div>
+            </div>
+        </div>
+
+        <button class="next-btn" id="nextBtn">
+            ► PROCEED TO FINAL SECTOR
+        </button>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Matrix background
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 16;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = [];
+
+        function initDrops() {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -canvas.height / fontSize;
+            }
+        }
+
+        initDrops();
+        window.addEventListener('resize', initDrops);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+
+                ctx.fillText(text, x, y);
+
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        // Next button
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            window.location.href = 'end.html';
+        });
+
+        // Background Music Autoplay (Try)
+        const bgMusic = document.getElementById('bgMusic');
+        // We will try to play it, but browser policies might block it until interaction
+        // Since user came from previous page, interaction might be registered already?
+        // It's safer to attach it to a user action if it wasn't playing.
+        // But let's act consistent with other pages.
+        document.body.addEventListener('click', () => {
+            bgMusic.play().catch(() => { });
+        });
+
+        // Set video playback speed
+        const video = document.getElementById('birthdayVideo');
+        if (video) {
+            video.playbackRate = 1.5;
+        }
+    </script>
+</body>
+
+</html>
